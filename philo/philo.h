@@ -6,7 +6,7 @@
 /*   By: skock <skock@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 18:23:59 by skock             #+#    #+#             */
-/*   Updated: 2025/02/26 16:49:00 by skock            ###   ########.fr       */
+/*   Updated: 2025/02/28 06:06:51 by skock            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,10 @@ typedef struct s_philo
 	int				time_to_eat;
 	int				time_to_sleep;
 	bool			have_to_eat;
-	long long		last_meal;
-	long long		start_time;
+	int				last_meal;
+	pthread_mutex_t	last_meal_mutex;
 	int				nb_meal;
-	int				simulation_running;
 	int				nb_philo;
-	bool			hold_fork;
 	bool			is_eating;
 	pthread_mutex_t	is_eating_mutex;
 	struct s_table *table;
@@ -46,11 +44,13 @@ typedef struct s_table
 {
 	int				nb_philosophers;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	last_meal_mutex;
 	pthread_mutex_t	nb_meal_mutex;
-	int				simulation_running;
+	bool			meal;
+	int				time_start;
 	bool			is_dead;
 	pthread_mutex_t	is_dead_mutex;
+	pthread_mutex_t	dying_mutex;
+	pthread_mutex_t print_mutex;
 	t_philo			*philo;
 }					t_table;
 
