@@ -6,7 +6,7 @@
 /*   By: skock <skock@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 18:23:59 by skock             #+#    #+#             */
-/*   Updated: 2025/02/28 06:06:51 by skock            ###   ########.fr       */
+/*   Updated: 2025/03/05 18:23:29 by skock            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ typedef struct s_philo
 	pthread_t		thread;
 	pthread_mutex_t	*left_fork_mutex;
 	pthread_mutex_t	*right_fork_mutex;
+	pthread_mutex_t	is_eating_mutex;
+	pthread_mutex_t	last_meal_mutex;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
 	bool			have_to_eat;
 	int				last_meal;
-	pthread_mutex_t	last_meal_mutex;
 	int				nb_meal;
 	int				nb_philo;
 	bool			is_eating;
-	pthread_mutex_t	is_eating_mutex;
 	struct s_table *table;
 }					t_philo;
 
@@ -56,6 +56,9 @@ typedef struct s_table
 
 int		ft_atoi(const char *str);
 int		verif_arg(int ac, char **av);
-
+int		get_each_ms(void);
+void	print(t_philo *philo, char *msg);
+int		dying(t_philo *philo);
+int		verif_is_dead(t_philo *philo);
 
 #endif
