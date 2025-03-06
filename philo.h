@@ -6,7 +6,7 @@
 /*   By: skock <skock@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 18:23:59 by skock             #+#    #+#             */
-/*   Updated: 2025/03/05 18:23:29 by skock            ###   ########.fr       */
+/*   Updated: 2025/03/05 18:18:26 by skock            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,7 @@ typedef struct s_table
 
 int		ft_atoi(const char *str);
 int		verif_arg(int ac, char **av);
-int		get_each_ms(void);
-void	print(t_philo *philo, char *msg);
-int		dying(t_philo *philo);
-int		verif_is_dead(t_philo *philo);
+int	get_each_ms(void);
+
 
 #endif

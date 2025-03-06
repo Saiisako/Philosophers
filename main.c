@@ -6,11 +6,65 @@
 /*   By: skock <skock@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:18:02 by skock             #+#    #+#             */
-/*   Updated: 2025/03/06 12:36:06 by skock            ###   ########.fr       */
+/*   Updated: 2025/03/06 17:32:23 by skock            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	print(t_philo *philo, char *msg)
+{
+	pthread_mutex_lock(&philo->table->dying_mutex);
+	pthread_mutex_lock(&philo->table->print_mutex);
+	if (philo->table->is_dead == false)
+		printf("%d %d %s\n", get_each_ms() - philo->table->time_start, philo->id, msg);
+	pthread_mutex_unlock(&philo->table->print_mutex);
+	pthread_mutex_unlock(&philo->table->dying_mutex);
+}
+
+int	verif_is_dead(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->last_meal_mutex);
+	pthread_mutex_lock(&philo->table->dying_mutex);
+	if (get_each_ms() - philo->last_meal >= philo->time_to_die + 9)
+	{
+		philo->table->is_dead = true;
+		pthread_mutex_unlock(&philo->table->dying_mutex);
+		pthread_mutex_unlock(&philo->last_meal_mutex);
+		return (1);
+	}
+	pthread_mutex_unlock(&philo->table->dying_mutex);
+	pthread_mutex_unlock(&philo->last_meal_mutex);
+	pthread_mutex_lock(&philo->table->dying_mutex);
+	if (philo->table->is_dead)
+	{
+		pthread_mutex_unlock(&philo->table->dying_mutex);
+		if (philo->table->meal == true)
+			return (1);
+		print(philo, "died");
+		return (1);
+	}
+	pthread_mutex_unlock(&philo->table->dying_mutex);
+	return (0);
+}
+
+
+int	dying(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->last_meal_mutex);
+	if (get_each_ms() - philo->last_meal >= philo->time_to_die + 9)
+	{
+		print(philo, "died");
+		pthread_mutex_lock(&philo->table->dying_mutex);
+		philo->table->is_dead = true;
+		pthread_mutex_unlock(&philo->table->dying_mutex);
+		pthread_mutex_unlock(&philo->last_meal_mutex);
+		// print(philo, "died");
+		return (0);
+	}
+	pthread_mutex_unlock(&philo->last_meal_mutex);
+	return (1);
+}
 
 int	ft_usleep(int time, t_philo *philo)
 {
@@ -94,14 +148,6 @@ void	*philo_routine(void *arg)
 	philo = (t_philo *)arg;
 	if (philo->id % 2 != 0)
 		usleep(100);
-	if (philo->table->nb_philosophers == 1)
-	{
-		print(philo, "is thinking");
-		print(philo, "has taken a fork");
-		usleep(philo->time_to_die * 1000);
-		print(philo, "died");
-		return (NULL);
-	}
 	while (1)
 	{
 		print(philo, "is thinking");
@@ -121,10 +167,7 @@ void	death_routine(t_table *table)
 {
 	int	i;
 	int	j;
-	
-	
-	if (table->nb_philosophers == 1)
-		return ;
+
 	while (1)
 	{
 		i = 0;
@@ -165,12 +208,14 @@ int	main(int ac, char **av)
 	table->philo = malloc(sizeof(t_philo) * table->nb_philosophers);
 	table->forks = malloc(sizeof(pthread_mutex_t) * table->nb_philosophers);
 	pthread_mutex_init(&table->print_mutex, NULL);
+	pthread_mutex_init(&table->is_dead_mutex, NULL);
 	pthread_mutex_init(&table->nb_meal_mutex, NULL);
 	pthread_mutex_init(&table->dying_mutex, NULL);
 	pthread_mutex_init(&table->philo->last_meal_mutex, NULL);
 	table->time_start = get_each_ms();
 	table->meal = false;
 	table->is_dead = false;
+	printf("%d\n", table->time_start);
 	i = 0;
 	while (i < table->nb_philosophers)
 	{
@@ -206,7 +251,12 @@ int	main(int ac, char **av)
 	i = 0;
 	death_routine(table);
 	while (i < table->nb_philosophers)
+	{
+		//printf("%d\n", i);
 		pthread_join(table->philo[i++].thread, NULL);
+		//printf("done\n");
+
+	}
 	free(table->philo);
 	free(table);
 	return (0);
