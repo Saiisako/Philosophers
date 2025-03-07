@@ -1,9 +1,14 @@
 NAME = philo
 CC = cc
-FLAGS = -Wall -Werror -Wextra -g #-fsanitize=thread 
+FLAGS = -Wall -Werror -Wextra -g -fsanitize=thread 
 RM = rm -rf
 
-SRCS	=	main.c philo_utils.c parsing.c\
+SRCS	=	main.c\
+			philo_utils.c\
+			parsing.c\
+			routine.c\
+			routine_utils.c\
+			death.c\
 
 OBJS = $(SRCS:.c=.o)
 

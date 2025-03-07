@@ -6,7 +6,7 @@
 /*   By: skock <skock@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 11:31:43 by skock             #+#    #+#             */
-/*   Updated: 2025/03/05 18:18:32 by skock            ###   ########.fr       */
+/*   Updated: 2025/03/07 14:54:21 by skock            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,31 @@ int	get_each_ms(void)
 
 	gettimeofday(&t, NULL);
 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+}
+
+int	ft_usleep(int time, t_philo *philo)
+{
+	int	i;
+
+	i = -1;
+	if (verif_is_dead(philo))
+		return (0);
+	while (++i < 10)
+	{
+		usleep(time / 10);
+		if (verif_is_dead(philo))
+			return (0);
+	}
+	return (1);
+}
+
+void	print(t_philo *philo, char *msg)
+{
+	pthread_mutex_lock(&philo->table->dying_mutex);
+	pthread_mutex_lock(&philo->table->print_mutex);
+	if (philo->table->is_dead == false)
+		printf("%d %d %s\n", get_each_ms() - philo->table->time_start,
+			philo->id, msg);
+	pthread_mutex_unlock(&philo->table->print_mutex);
+	pthread_mutex_unlock(&philo->table->dying_mutex);
 }
